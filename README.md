@@ -43,6 +43,21 @@ npm run lint
 - POST `/auth/login` (protegido por HMAC)
   - Body: `{ email: string, password: string }`
   - 200: `{ token: string }`
+- POST `/favorites` (HMAC + `Authorization: Bearer <token>`)
+  - Body: `{ productId: number }`
+  - 204: sem corpo
+- GET `/favorites` (HMAC + `Authorization: Bearer <token>`)
+  - 200: `{ productIds: number[] }`
+- DELETE `/favorites/{productId}` (HMAC + `Authorization: Bearer <token>`)
+  - 204: sem corpo
+- GET `/products` (proxy FakeStore, público)
+  - 200: `ProductSummary[]`
+- GET `/products/{id}` (proxy FakeStore, público)
+  - 200: `ProductDetail`
+  - 404: quando não encontrado
+- Documentação
+  - GET `/openapi.json` (OpenAPI 3.0)
+  - GET `/docs/` (Swagger UI)
 
 ## HMAC nas rotas
 
@@ -66,6 +81,7 @@ const sig = signBody(process.env.HMAC_SECRET, ts, body);
 // headers:
 // 'x-hmac-timestamp': ts
 // 'x-hmac-signature': sig
+// 'Authorization': `Bearer ${token}` // quando exigido
 ```
 
 Observação: O servidor captura `rawBody` via `express.json({ verify })` para validar a assinatura.
@@ -87,8 +103,8 @@ Repositório atual: `InMemoryUserRepository` (sem banco). Ao migrar para DB, sub
 
 ## Resultados atuais de testes
 
-- Suites: 4 passed
-- Tests: 10 passed
+- Suites: 6 passed
+- Tests: 13 passed
 
 ## Segurança
 
